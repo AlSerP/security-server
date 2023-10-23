@@ -1,26 +1,55 @@
 require 'sinatra'
+require 'json'
 
 require_relative 'models/auth'
+require_relative 'db/db'
 
 enable :sessions
+Db::Database.load
+
+ERROR_MESSAGE = 'Login error'
+
+# def login_required()
+#   @user = session['user']
+#   return 403 unless @user.exists?
+# end
+
+error 403 do
+  'Access forbidden'
+end
 
 get '/' do
+  # puts Db::Database.users
   erb :login
 end
 
 post '/user/login' do
-  ERROR_MESSAGE = 'Login error'
-
-  login = params['login']
+  username = params['username']
   password = params['password']
 
-  user = Auth::User.login(login, password)
+  puts "GOT LOGIN WITH #{username} #{password}"
+  user = Auth::User.login(username, password)
   
   return ERROR_MESSAGE unless user
 
 
-  response = "You are #{user.name}"
   session[:user] = user.to_s
 
-  response
+  redirect '/user/profile'
+end
+
+get '/user/logout' do
+  @user = session[:user]
+  return 403 unless @user
+
+  session.clear
+  redirect '/'
+end
+
+get '/user/profile' do
+  @user = session[:user]
+  return 403 unless @user
+
+  
+  erb :profile
 end

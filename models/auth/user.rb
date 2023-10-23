@@ -1,9 +1,9 @@
 module Auth
   class User
-    attr_reader :name, :password, :is_admin
+    attr_reader :username, :password, :is_admin
 
-    def initialize(name, password)
-      @name = name
+    def initialize(username, password)
+      @username = username
       @password = password
       @is_admin = false
     end
@@ -23,10 +23,11 @@ module Auth
       return true
     end
 
-    def self.login(login, password)
+    def self.login(username, password)
       current_user = nil
-      Auth::USERS.each do |user|
-        current_user = user if login == user.name
+      puts "GOT #{username} #{password}"
+      Db::Database.users.each do |user|
+        current_user = user if username == user.username
       end
       
       return nil unless current_user
@@ -34,7 +35,7 @@ module Auth
     end
 
     def to_s
-      @login
+      @username
     end
   end
 end
