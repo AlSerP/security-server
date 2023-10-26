@@ -1,0 +1,19 @@
+<%= erb :_header %>
+
+<h1>Регистрация</h1>
+
+<% unless @enable_error %>
+<form method="post" action="/user/signup">
+  <input placeholder="Логин" name="username" type="text">
+  <input placeholder="Пароль" name="password" type="password">
+  <input placeholder="Повторите пароль" name="password_2" type="password">
+
+  <% if @error_message %>
+    <span style="color: red"><%= @error_message %></span>
+  <% end %>
+
+  <button type="submit">Зарегистрироваться</button>
+</form>
+<% else %>
+  <h2><%= @enable_error %></h2>
+<% end %>

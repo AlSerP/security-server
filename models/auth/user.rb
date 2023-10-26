@@ -1,11 +1,33 @@
 module Auth
   class User
-    attr_reader :username, :password, :is_admin
+    attr_reader :username, :password
 
-    def initialize(username, password)
+    def initialize(username, password, is_blocked=false, is_validating=false)
       @username = username
       @password = password
+
+      @is_blocked = is_blocked
+      @is_validating = is_validating
+
       @is_admin = false
+    end
+
+    def admin?
+      @is_admin
+    end
+
+    def blocked?
+      @is_blocked
+    end
+
+    def validating?
+      @is_validating
+    end
+
+    def save
+      return nil unless Db::Database.find_user username
+
+      Db::Database.save
     end
 
     def change_password(old_password, new_password)
@@ -32,6 +54,20 @@ module Auth
       
       return nil unless current_user
       return current_user if current_user.is_login password
+    end
+
+    def to_hash
+      {
+        "username" => @username,
+        "password" => @password,
+        "is_admin" => admin?,
+        "is_blocked" => blocked?,
+        "is_validating" => validating?
+      }
+    end
+
+    def to_json
+      to_hash.to_json
     end
 
     def to_s

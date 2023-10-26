@@ -1,12 +1,1 @@
-[
-  {
-    "username": "user",
-    "password": "1234",
-    "is_admin": false
-  },
-  {
-    "username": "admin",
-    "password": "1234",
-    "is_admin": true
-  }
-]
+[{"username":"admin","password":"1234","is_admin":true,"is_blocked":false,"is_validating":false},{"username":"user","password":"1234","is_admin":false,"is_blocked":false,"is_validating":false},{"username":"lox Никита","password":"1234","is_admin":false,"is_blocked":false,"is_validating":false}]

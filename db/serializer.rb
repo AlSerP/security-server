@@ -5,7 +5,7 @@ module Db
         
       end
 
-      def json_to_user(data)
+      def hash_to_user(data)
         klass = Auth::User
         klass = Auth::Admin if data['is_admin']
 

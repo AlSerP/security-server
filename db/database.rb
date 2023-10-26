@@ -8,28 +8,66 @@ module Db
 
       def load
         puts "Loadig #{DB_NAME} from #{DB_PATH}"
-        db = File.open(DB_PATH.to_s + '/' + DB_NAME).read
+        db = File.open(db_file).read
         @users = self.json_to_users JSON.parse db
+        if @users.empty?
+          fixtures!
+        end
       end
-      
+
       def find_user(username)
         users.each do |user|
-          user[username]
+          return user if user.username == username 
         end
-        return nil unless users.keys.include? username 
+        
+        nil
+      end
+
+      def create_user(data)
+        user = Db::Serializer.hash_to_user data
+        @users << user
+
+        save
+        user
+      end
+
+      def save
+        data = []
+        users.each { |user| data.push user.to_hash }
+        File.write(db_file, data.to_json)
+        # with File.open
+        # data.to_json
       end
 
       private
 
+      def fixtures!
+        Db::Database.create_user(
+          {
+          'username' => 'admin', 
+          'password' => '1234',
+          'is_admin' => 'admin'
+          }
+        )
+        Db::Database.create_user(
+          {
+          'username' => 'user',
+          'password' => '1234'
+          }
+        )
+      end
+
+      def db_file
+        DB_PATH.to_s + '/' + DB_NAME
+      end
+
       def json_to_users(data)
         users = []
         data.each do |user|
-          users.push Serializer.json_to_user user
+          users.push Serializer.hash_to_user user
         end
-        return users
-      end
 
-      def user_to_json(data)
+        users
       end
     end
   end

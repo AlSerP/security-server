@@ -1,0 +1,20 @@
+<%= erb :_header %>
+
+<h2>Список пользователей</h2>
+<hr>
+<table>
+  <thead>
+    <tr><td>Имя</td> <td>Админ</td> <td>Заблокирован</td> <td>Ограничения на пароль</td> </tr>
+  </thead>
+  <tbody>
+    <% @users.each do |user| %>
+      <tr>
+        <td> <%= user.username %> </td>
+        <td> <%= user.admin? ? 'Да' : 'Нет' %> </td>
+        <td> <%= user.blocked? ? 'Да' : 'Нет' %> </td>
+        <td> <%= user.validating? ? 'Да' : 'Нет' %> </td>
+      </tr>
+    <% end %>
+
+</tbody>
+</table>
