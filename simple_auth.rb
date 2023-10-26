@@ -120,10 +120,10 @@ post '/user/signup' do
     @error_message ||= MATCH_ERROR_PASSWORD_MESSAGE
   end
 
-  unless Auth::User.password_valid? password
-    is_valid = false
-    @error_message ||= INCORRECT_PASSWORD_MESSAGE
-  end
+  # unless Auth::User.password_valid? password
+  #   is_valid = false
+  #   @error_message ||= INCORRECT_PASSWORD_MESSAGE
+  # end
 
   if is_valid
     Db::Database.create_user({
@@ -148,8 +148,17 @@ post '/user/change_password' do
   @user = user
   return 403 unless @user
 
-  logger.info "CHANGE PASSWORD WITH old: #{params['old_password']}, new: #{params['new_password']}"
-  @error_message = USER_OLD_PASSWORD_MATCH_ERROR unless @user.change_password(params['old_password'], params['new_password'])
+  old_password, new_password = params['old_password'], params['new_password']
+
+  logger.info "CHANGE PASSWORD WITH old: #{old_password}, new: #{new_password}"
+
+  unless @user.password_valid? old_password
+    is_valid = false
+    @error_message ||= INCORRECT_PASSWORD_MESSAGE
+  end
+  
+  @error_message ||= USER_OLD_PASSWORD_MATCH_ERROR unless @user.change_password(old_password, new_password)
+
 
   return erb :change_pass if @error_message
 
@@ -162,6 +171,16 @@ post '/user/block/:name' do
 
   target = Db::Database.find_user params['name']
   target.block
+
+  redirect '/admin'
+end
+
+post '/user/validate/:name' do
+  @user = admin
+  return 404 unless @user
+
+  target = Db::Database.find_user params['name']
+  target.turn_validate
 
   redirect '/admin'
 end

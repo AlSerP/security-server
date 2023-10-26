@@ -2,6 +2,8 @@ module Auth
   class User
     attr_reader :username, :password
 
+    MARKS = %[, . : ; ? ! " ' - _]
+
     def initialize(username, password, is_blocked=false, is_validating=false)
       @username = username
       @password = password
@@ -24,6 +26,10 @@ module Auth
       @is_blocked = !@is_blocked
     end
 
+    def turn_validate
+      @is_validating = !@is_validating
+    end
+
     def validating?
       @is_validating
     end
@@ -36,8 +42,9 @@ module Auth
 
     def change_password(old_password, new_password)
       return nil unless old_password == @password
-
-      @password = new_password if self.class.password_valid? new_password
+      return nil unless password_valid? new_password
+      
+      @password = new_password
       save
     end
 
@@ -49,12 +56,24 @@ module Auth
       @password.empty?
     end
 
-    class << self
-      def password_valid?(password)
-        # TODO: Validation
-        true
+    def password_valid?(password)
+      return true unless validating?
+
+      is_lower = false
+      is_upper = false
+      is_marks = false
+
+      password.each_char do |s|
+        is_lower = true if s >= 'a' && s <= 'z'
+        is_upper = true if s >= 'A' && s <= 'Z'
+        is_marks = true if MARKS.include? s
       end
 
+      puts "RESULTS IS #{is_lower} #{is_upper} #{is_marks}"
+      is_lower && is_upper && is_marks
+    end
+
+    class << self
       def login(username, password)
         current_user = nil
 
