@@ -20,6 +20,10 @@ module Auth
       @is_blocked
     end
 
+    def block
+      @is_blocked = !@is_blocked
+    end
+
     def validating?
       @is_validating
     end
@@ -33,7 +37,7 @@ module Auth
     def change_password(old_password, new_password)
       return nil unless old_password == @password
 
-      @password = new_password if self.class.is_password_valid new_password
+      @password = new_password if self.class.password_valid? new_password
       save
     end
 
@@ -41,20 +45,30 @@ module Auth
       password == @password
     end
 
-    def self.is_password_valid(password)
-      # TODO: Validation
-      return true
+    def empty_password?
+      @password.empty?
     end
 
-    def self.login(username, password)
-      current_user = nil
-      
-      Db::Database.users.each do |user|
-        current_user = user if username == user.username
+    class << self
+      def password_valid?(password)
+        # TODO: Validation
+        true
       end
 
-      return nil unless current_user
-      return current_user if current_user.login? password
+      def login(username, password)
+        current_user = nil
+
+        Db::Database.users.each do |user|
+          current_user = user if username == user.username
+        end
+
+        return nil unless current_user
+        current_user if current_user.login? password
+      end
+
+      def uniq?(username)
+        Db::Database.find_user(username) ? false : true 
+      end
     end
 
     def to_hash

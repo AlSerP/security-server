@@ -13,8 +13,9 @@
         <td> <%= user.admin? ? 'Да' : 'Нет' %> </td>
         <td> <%= user.blocked? ? 'Да' : 'Нет' %> </td>
         <td> <%= user.validating? ? 'Да' : 'Нет' %> </td>
+        <td> <form method='post' action='user/block/<%= user.username %>'><button type="submit"><%= user.blocked? ? 'Разблокировать' : 'Заблокировать' %></button></form></td>
       </tr>
     <% end %>
-
 </tbody>
 </table>
+<a href="/admin/add_user">Создать пользователя</a>

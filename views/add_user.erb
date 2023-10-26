@@ -1,0 +1,13 @@
+<%= erb :_header %>
+
+<h1>Создание пользователя</h1>
+
+<form method="post" action="/admin/add_user">
+  <input placeholder="Имя пользователя" name="username" type="text">
+
+  <% if @error_message %>
+    <span style="color: red"><%= @error_message %></span>
+  <% end %>
+
+  <button type="submit">Создать</button>
+</form>

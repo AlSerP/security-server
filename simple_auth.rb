@@ -23,13 +23,26 @@ USER_OLD_PASSWORD_MATCH_ERROR = 'Вы ввели неправильный пар
 # end
 
 def user
-  nil unless session[:user]
+  return nil unless session[:user]
 
   Db::Database.find_user session[:user]
 end
 
+def admin
+  return nil unless session[:user]
+
+  user = Db::Database.find_user session[:user]
+  return nil unless user.admin?
+
+  user
+end
+
 error 403 do
-  'Access forbidden'
+  'Доступ запрещен'
+end
+
+error 404 do
+  'Страница не найдена'
 end
 
 get '/' do
@@ -59,6 +72,8 @@ post '/user/login' do
   return erb :login if @error_message
 
   session[:user] = user.to_s
+  redirect '/user/change_password' if user.empty_password?
+
   if user.admin?
     redirect '/admin'
   else
@@ -95,7 +110,7 @@ post '/user/signup' do
 
   is_valid = true
 
-  if Db::Database.find_user username
+  if Auth::User.uniq? username
     is_valid = false
     @error_message ||= USER_EXIST_MESSAGE
   end
@@ -105,7 +120,7 @@ post '/user/signup' do
     @error_message ||= MATCH_ERROR_PASSWORD_MESSAGE
   end
 
-  unless Auth::User.is_password_valid password
+  unless Auth::User.password_valid? password
     is_valid = false
     @error_message ||= INCORRECT_PASSWORD_MESSAGE
   end
@@ -141,9 +156,47 @@ post '/user/change_password' do
   redirect 'user/login'
 end
 
+post '/user/block/:name' do
+  @user = admin
+  return 404 unless @user
+
+  target = Db::Database.find_user params['name']
+  target.block
+
+  redirect '/admin'
+end
+
 # Admin
 get '/admin' do
   @users = Db::Database.users
+  @user = admin
+  return 404 unless @user
 
   erb :admin
+end
+
+get '/admin/add_user' do
+  @user = admin
+  return 404 unless @user
+
+  erb :add_user
+end
+
+post '/admin/add_user' do
+  @user = admin
+  return 404 unless @user
+
+  username = params['username']
+  unless Auth::User.uniq? username
+    @error_message = USER_EXIST_MESSAGE
+    return erb :add_user
+  end
+
+  Db::Database.create_user({
+    'username' => username,
+    'password' => '',
+    'is_validating' => true
+  })
+
+  redirect '/admin'
 end

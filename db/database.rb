@@ -18,7 +18,7 @@ module Db
 
       def find_user(username)
         users.each do |user|
-          return user if user.username == username 
+          return user if user.username == username
         end
 
         nil
