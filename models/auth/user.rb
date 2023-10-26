@@ -33,10 +33,11 @@ module Auth
     def change_password(old_password, new_password)
       return nil unless old_password == @password
 
-      @password = new_password if self.is_password_valid new_password 
+      @password = new_password if self.class.is_password_valid new_password
+      save
     end
 
-    def is_login(password)
+    def login?(password)
       password == @password
     end
 
@@ -47,13 +48,13 @@ module Auth
 
     def self.login(username, password)
       current_user = nil
-      puts "GOT #{username} #{password}"
+      
       Db::Database.users.each do |user|
         current_user = user if username == user.username
       end
-      
+
       return nil unless current_user
-      return current_user if current_user.is_login password
+      return current_user if current_user.login? password
     end
 
     def to_hash

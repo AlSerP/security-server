@@ -7,7 +7,8 @@ module Db
       attr_reader :users
 
       def load
-        puts "Loadig #{DB_NAME} from #{DB_PATH}"
+        # logger.info "LOADING #{DB_NAME} from #{DB_PATH}"
+        # puts "Loadig #{DB_NAME} from #{DB_PATH}"
         db = File.open(db_file).read
         @users = self.json_to_users JSON.parse db
         if @users.empty?
@@ -19,7 +20,7 @@ module Db
         users.each do |user|
           return user if user.username == username 
         end
-        
+
         nil
       end
 
@@ -44,21 +45,21 @@ module Db
       def fixtures!
         Db::Database.create_user(
           {
-          'username' => 'admin', 
-          'password' => '1234',
-          'is_admin' => 'admin'
+            'username' =>  'admin',
+            'password' => '1234',
+            'is_admin' => 'admin'
           }
         )
         Db::Database.create_user(
           {
-          'username' => 'user',
-          'password' => '1234'
+            'username' => 'user',
+            'password' => '1234'
           }
         )
       end
 
       def db_file
-        DB_PATH.to_s + '/' + DB_NAME
+        "#{DB_PATH}/#{DB_NAME}"
       end
 
       def json_to_users(data)

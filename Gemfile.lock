@@ -1,4 +1,5 @@
 GEM
+  remote: https://rubygems.org/
   specs:
     mustermann (3.0.0)
       ruby2_keywords (~> 0.0.1)
@@ -20,8 +21,8 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  puma
-  sinatra
+  puma (= 6.4.0)
+  sinatra (= 3.1.0)
 
 BUNDLED WITH
    2.4.20

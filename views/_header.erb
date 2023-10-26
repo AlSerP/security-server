@@ -1,6 +1,7 @@
 <header>
   <% if @user %>
     <span><%= @user %></span>
+    <a href="/user/change_password">Сменить пароль</a>
     <a href="/user/logout">Выйти</a>
   <% else %>
     <a href="/">Войти</a> | <a href="/user/signup"> Регистрация </a>

@@ -5,21 +5,24 @@ require_relative 'models/auth'
 require_relative 'db/db'
 
 enable :sessions
+use Rack::Logger
 Db::Database.load
 
-LOGIN_ERROR_MESSAGE = 'Неправильное имя пользователя или пароль'
-LOGGED_IN_MESSAGE = 'Вы уже авторизованы'
+LOGIN_ERROR_MESSAGE = 'Неправильное имя пользователя или пароль'.freeze
+LOGGED_IN_MESSAGE = 'Вы уже авторизованы'.freeze
 
-INCORRECT_PASSWORD_MESSAGE = 'Пароль не соответсвует требованиям'
-MATCH_ERROR_PASSWORD_MESSAGE = 'Пароли должны совпадать' 
-USER_EXIST_MESSAGE = 'Пользователь с таким именем уже существует' 
+INCORRECT_PASSWORD_MESSAGE = 'Пароль не соответсвует требованиям'.freeze
+MATCH_ERROR_PASSWORD_MESSAGE = 'Пароли должны совпадать'.freeze
+USER_EXIST_MESSAGE = 'Пользователь с таким именем уже существует'.freeze
+USER_BLOCKED_MESSAGE = 'Данный пользователь заблокирован. Вход невозможен'.freeze
+USER_OLD_PASSWORD_MATCH_ERROR = 'Вы ввели неправильный пароль'.freeze
 
 # def login_required()
 #   @user = session['user']
 #   return 403 unless @user.exists?
 # end
 
-def get_user
+def user
   nil unless session[:user]
 
   Db::Database.find_user session[:user]
@@ -44,17 +47,18 @@ post '/user/login' do
   username = params['username']
   password = params['password']
 
-  puts "GOT LOGIN WITH #{username} #{password}"
+  logger.info "LOGIN WITH username: #{username}, password: #{password}"
   user = Auth::User.login(username, password)
-  
-  unless user
+
+  if user
+    @error_message = USER_BLOCKED_MESSAGE if user.blocked?
+  else
     @error_message = LOGIN_ERROR_MESSAGE
-    return erb :login
   end
 
+  return erb :login if @error_message
 
   session[:user] = user.to_s
-
   if user.admin?
     redirect '/admin'
   else
@@ -74,7 +78,6 @@ get '/user/profile' do
   @user = session[:user]
   return 403 unless @user
 
-  
   erb :profile
 end
 
@@ -87,8 +90,8 @@ end
 
 post '/user/signup' do
   username = params['username']
-  password = params['password']  
-  password_2 = params['password_2'] # Повторный ввод  
+  password = params['password']
+  password_2 = params['password_2'] # Повторный ввод
 
   is_valid = true
 
@@ -118,10 +121,29 @@ post '/user/signup' do
   erb :signup
 end
 
+get '/user/change_password' do
+  @user = user
+
+  return 403 unless @user
+
+  return erb :change_pass
+end
+
+post '/user/change_password' do
+  @user = user
+  return 403 unless @user
+
+  logger.info "CHANGE PASSWORD WITH old: #{params['old_password']}, new: #{params['new_password']}"
+  @error_message = USER_OLD_PASSWORD_MATCH_ERROR unless @user.change_password(params['old_password'], params['new_password'])
+
+  return erb :change_pass if @error_message
+
+  redirect 'user/login'
+end
 
 # Admin
 get '/admin' do
   @users = Db::Database.users
 
-  erb :admin 
+  erb :admin
 end

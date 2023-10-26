@@ -1,0 +1,14 @@
+<%= erb :_header %>
+
+<h1>Смена пароля</h1>
+
+<form method="post" action="/user/change_password">
+  <input placeholder="Старый пароль" name="old_password" type="password">
+  <input placeholder="Новый пароль" name="new_password" type="password">
+
+  <% if @error_message %>
+    <span style="color: red"><%= @error_message %></span>
+  <% end %>
+
+  <button type="submit">Войти</button>
+</form>
