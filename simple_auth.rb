@@ -38,11 +38,11 @@ def admin
 end
 
 error 403 do
-  'Доступ запрещен'
+  erb :err_403
 end
 
 error 404 do
-  'Страница не найдена'
+  erb err_404
 end
 
 get '/' do
@@ -65,6 +65,7 @@ post '/user/login' do
 
   if user
     @error_message = USER_BLOCKED_MESSAGE if user.blocked?
+    session[:user] = user.to_s; redirect '/user/new_password' if user.empty_password?
   else
     @error_message = LOGIN_ERROR_MESSAGE
   end
@@ -72,7 +73,6 @@ post '/user/login' do
   return erb :login if @error_message
 
   session[:user] = user.to_s
-  redirect '/user/change_password' if user.empty_password?
 
   if user.admin?
     redirect '/admin'
@@ -152,7 +152,7 @@ post '/user/change_password' do
 
   logger.info "CHANGE PASSWORD WITH old: #{old_password}, new: #{new_password}"
 
-  unless @user.password_valid? old_password
+  unless @user.password_valid? new_password
     is_valid = false
     @error_message ||= INCORRECT_PASSWORD_MESSAGE
   end
@@ -163,6 +163,36 @@ post '/user/change_password' do
   return erb :change_pass if @error_message
 
   redirect 'user/login'
+end
+
+get '/user/new_password' do
+  @user = user
+
+  return 403 unless @user
+  return 403 unless @user.password.empty?
+
+  @error_message ||= INCORRECT_PASSWORD_MESSAGE 
+
+  return erb :fill_password
+end
+
+post '/user/new_password' do
+  @user = user
+
+  return 403 unless @user
+  return 403 unless @user.password.empty?
+
+  password = params['password']
+
+  unless @user.password_valid? password
+    @error_message ||= INCORRECT_PASSWORD_MESSAGE
+  end
+
+  # @error_message ||= USER_OLD_PASSWORD_MATCH_ERROR unless change_password('', new_password)
+
+  return erb :fill_password if @error_message  
+
+  redirect '/'
 end
 
 post '/user/block/:name' do

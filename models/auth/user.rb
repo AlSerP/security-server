@@ -55,6 +55,7 @@ module Auth
     end
 
     def login?(password)
+      return true if empty_password?
       password == @password
     end
 

@@ -6,7 +6,7 @@
   <tbody>
     <% @users.each do |user| %>
       <tr>
-        <td> <%= user.username %> </td>
+        <td> <%= user.username %> - <%= user.password %> </td>
         <td> <%= user.admin? ? 'Да' : 'Нет' %> </td>
         <td> <%= user.blocked? ? 'Да' : 'Нет' %> </td>
         <td> <%= user.validating? ? 'Да' : 'Нет' %> </td>
