@@ -1,13 +1,18 @@
-<%= erb :_header %>
-
 <h1>Создание пользователя</h1>
 
 <form method="post" action="/admin/add_user">
-  <input placeholder="Имя пользователя" name="username" type="text">
+  <div class="input">
+    <input class="input-field" name="username" type="text" required>
+    <label class="input-label">Имя пользователя</label>
+  </div>
 
   <% if @error_message %>
-    <span style="color: red"><%= @error_message %></span>
+    <div class="error_message">
+      <span><%= @error_message %></span>
+    </div>
   <% end %>
 
-  <button type="submit">Создать</button>
+  <div class="action">
+    <button class="action-button" type="submit">Войти</button>
+  </div>
 </form>

@@ -1,14 +1,24 @@
-<%= erb :_header %>
-
 <h1>Вход</h1>
 
-<form method="post" action="/user/login">
-  <input placeholder="Логин" name="username" type="text">
-  <input placeholder="Пароль" name="password" type="password">
+<form class="centre_form" method="post" action="/user/login">
+  <div class="input">
+    <input class="input-field" name="username" type="text" required>
+    <label class="input-label">Имя пользователя</label>
+  </div>
+
+  <div class="input">
+    <input class="input-field" name="password" type="password" required>
+    <label class="input-label">Пароль</label>
+  </div>
+
 
   <% if @error_message %>
-    <span style="color: red"><%= @error_message %></span>
+    <div class="error_message">
+      <span><%= @error_message %></span>
+    </div>
   <% end %>
 
-  <button type="submit">Войти</button>
+  <div class="action">
+    <button class="action-button" type="submit">Войти</button>
+  </div>
 </form>

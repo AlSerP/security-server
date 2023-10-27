@@ -82,7 +82,7 @@ post '/user/login' do
 end
 
 get '/user/logout' do
-  @user = session[:user]
+  @user = user
   return 403 unless @user
 
   session.clear
@@ -90,7 +90,7 @@ get '/user/logout' do
 end
 
 get '/user/profile' do
-  @user = session[:user]
+  @user = user
   return 403 unless @user
 
   erb :profile

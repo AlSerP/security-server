@@ -1,7 +1,4 @@
-<%= erb :_header %>
-
-<h2>Список пользователей</h2>
-<hr>
+<h1>Список пользователей</h1>
 <table>
   <thead>
     <tr><td>Имя</td> <td>Админ</td> <td>Заблокирован</td> <td>Ограничения на пароль</td> </tr>
@@ -13,8 +10,12 @@
         <td> <%= user.admin? ? 'Да' : 'Нет' %> </td>
         <td> <%= user.blocked? ? 'Да' : 'Нет' %> </td>
         <td> <%= user.validating? ? 'Да' : 'Нет' %> </td>
-        <td> <form method='post' action='user/block/<%= user.username %>'><button type="submit"><%= user.blocked? ? 'Разблокировать' : 'Заблокировать' %></button></form></td>
-        <td> <form method='post' action='user/validate/<%= user.username %>'><button type="submit"><%= !user.validating? ? 'Включить валидацию' : 'Выключить валидацию' %></button></form></td>
+        <td> 
+            <form method='post' action='user/block/<%= user.username %>'>
+              <button class="turn_button" type="submit" <%= 'disabled' if user.admin? %>><%= user.blocked? ? 'Разблокировать' : 'Заблокировать' %></button>
+            </form>
+          </td>
+        <td> <form method='post' action='user/validate/<%= user.username %>'><button class="turn_button" type="submit"><%= !user.validating? ? 'Включить валидацию' : 'Выключить валидацию' %></button></form></td>
       </tr>
     <% end %>
 </tbody>
