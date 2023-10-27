@@ -24,10 +24,16 @@ module Auth
 
     def block
       @is_blocked = !@is_blocked
+      Db::Database.save
+
+      @is_blocked
     end
 
     def turn_validate
       @is_validating = !@is_validating
+      Db::Database.save
+
+      @is_validating
     end
 
     def validating?
